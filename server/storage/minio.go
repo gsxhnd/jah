@@ -48,3 +48,7 @@ func (s *minioStorage) Ping() error {
 func (s *minioStorage) GetImage(cover string, id uint, filename string) ([]byte, string, error) {
 	return nil, "", nil
 }
+
+func (s *minioStorage) SaveImage(data []byte, id uint, filename string) error {
+	return nil
+}

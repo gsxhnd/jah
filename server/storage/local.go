@@ -58,3 +58,7 @@ func (s *localStorage) GetImage(cover string, id uint, filename string) ([]byte,
 
 	return buff, f, nil
 }
+
+func (s *localStorage) SaveImage(data []byte, id uint, filename string) error {
+	return nil
+}

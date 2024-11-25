@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gsxhnd/jaha/server/db/database"
 	"github.com/gsxhnd/jaha/server/errno"
 	"github.com/gsxhnd/jaha/server/model"
 	"github.com/gsxhnd/jaha/server/service"
+	"github.com/gsxhnd/jaha/server/storage"
 	"github.com/gsxhnd/jaha/utils"
 )
 
@@ -14,15 +17,17 @@ type MovieHandler interface {
 	CreateMovies(ctx *fiber.Ctx) error
 	DeleteMovies(ctx *fiber.Ctx) error
 	UpdateMovie(ctx *fiber.Ctx) error
+	UploadCover(ctx *fiber.Ctx) error
 	GetMovies(ctx *fiber.Ctx) error
 	GetMovieInfo(ctx *fiber.Ctx) error
 	SearchMovies(ctx *fiber.Ctx) error
 }
 
 type movieHandle struct {
-	valid  *validator.Validate
-	svc    service.MovieService
-	logger utils.Logger
+	valid   *validator.Validate
+	svc     service.MovieService
+	logger  utils.Logger
+	storage storage.Storage
 }
 
 func NewMovieHandler(svc service.MovieService, v *validator.Validate, l utils.Logger) MovieHandler {
@@ -155,4 +160,40 @@ func (h *movieHandle) SearchMovies(ctx *fiber.Ctx) error {
 		return ctx.JSON(errno.DecodeError(err))
 	}
 	return ctx.JSON(errno.OK.WithData(data))
+}
+
+// @Summary      Upload movie cover
+// @Description  Upload movie cover by movie id
+// @Tags         movie
+// @Produce      json
+// @Param        code query string true "movie code"
+// @Success      200 {object} errno.errno{data=[]model.Movie}
+// @Router       /movie/cover [put]
+func (h movieHandle) UploadCover(ctx *fiber.Ctx) error {
+	// code := ctx.Params("code", "")
+	// data, err := h.svc.GetMovieInfo(code)
+	// if err != nil {
+	// 	return ctx.JSON(errno.DecodeError(err))
+	// }
+
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		return ctx.JSON(errno.DecodeError(err))
+	}
+
+	files := form.File["cover"]
+	if files == nil || len(files) <= 0 || len(files) > 1 {
+		return ctx.JSON(errno.DecodeError(err))
+	}
+
+	fmt.Println(files[0].Filename, files[0].Size, files[0].Header["Content-Type"][0])
+	f, _ := files[0].Open()
+	defer f.Close()
+
+	var b = make([]byte, 0)
+	n, e := f.Read(b)
+	fmt.Println(n, e)
+	fmt.Println(b)
+
+	return nil
 }

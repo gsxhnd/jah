@@ -5,10 +5,10 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/gsxhnd/jaha/web"
 	"github.com/gsxhnd/jaha/server/handler"
 	"github.com/gsxhnd/jaha/server/middleware"
 	"github.com/gsxhnd/jaha/utils"
+	"github.com/gsxhnd/jaha/web"
 )
 
 type Router interface {
@@ -60,6 +60,7 @@ func (r *router) Run() error {
 	api.Get("/movie", r.h.MovieHandler.GetMovies)
 	api.Get("/movie/info/:code", r.h.MovieHandler.GetMovieInfo)
 	api.Get("/movie/search", r.h.MovieHandler.SearchMovies)
+	api.Put("/movie/cover/:code", r.h.MovieHandler.UploadCover)
 	// actor api
 	api.Post("/actor", r.h.ActorHandler.CreateActors)
 	api.Delete("/actor", r.h.ActorHandler.DeleteActors)
