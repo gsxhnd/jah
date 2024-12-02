@@ -1,20 +1,24 @@
 package utils
 
 import (
+	"path"
+
 	"github.com/caarlos0/env/v11"
 )
 
 type Config struct {
-	Mode         string `env:"MODE" envDefault:"dev"`
-	DatabasePath string `env:"DB_PATH" envDefault:"./data/jaha.db"`
-	Listen       string `env:"LISTEN" envDefault:":8080"`
-	Log          LogConfig
-	Storage      StorageConfig
+	Mode           string `env:"MODE" envDefault:"dev"`
+	Listen         string `env:"LISTEN" envDefault:":8080"`
+	DataPath       string `env:"DATA_PATH" envDefault:"./data"`
+	Log            LogConfig
+	Storage        StorageConfig
+	DatabaseConfig DatabaseConfig
 }
 
 type LogConfig struct {
+	Path       string `env:"LOG_PATH" envDefault:"./log"`
+	FileName   string `env:"LOG_FILE_NAME" envDefault:"./jaha.log"`
 	Level      string `env:"LOG_LEVEL" envDefault:"debug"`
-	FileName   string `env:"LOG_FILE_NAME" envDefault:"./data/log/jaha.log"`
 	MaxBackups int    `env:"LOG_MAX_BACKUPS" envDefault:"10"`
 	MaxAge     int    `env:"LOG_MAX_AGE" envDefault:"7"`
 }
@@ -28,6 +32,11 @@ type StorageConfig struct {
 	SecretKey  string `env:"STORAGE_SECRET_KEY"`
 }
 
+type DatabaseConfig struct {
+	Type string `env:"DB_TYPE" envDefault:"sqlite3"`
+	Path string `env:"DB_PATH" envDefault:"jaha.db"`
+}
+
 func NewConfig() (*Config, error) {
 	var c Config
 
@@ -36,6 +45,14 @@ func NewConfig() (*Config, error) {
 	}
 
 	if err := env.ParseWithOptions(&c, opts); err != nil {
+		return nil, err
+	}
+
+	if err := MakeDir(path.Join(c.DataPath)); err != nil {
+		return nil, err
+	}
+
+	if err := MakeDir(path.Join(c.DataPath, c.Log.Path)); err != nil {
 		return nil, err
 	}
 

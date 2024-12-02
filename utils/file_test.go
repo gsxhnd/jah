@@ -12,8 +12,8 @@ func TestMakeDir(t *testing.T) {
 		path    string
 		wantErr bool
 	}{
-		{"test", "../javbus/cover", false},
-		{"test_repeat", "../javbus/cover", false},
+		{"test", "../data/cover", false},
+		{"test_repeat", "../data/cover", false},
 		{"test_repeat", "../testdata/1/1.ass", true},
 	}
 	for _, tt := range tests {

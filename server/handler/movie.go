@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"io"
 
 	"github.com/go-playground/validator/v10"
@@ -173,7 +172,7 @@ func (h *movieHandle) SearchMovies(ctx *fiber.Ctx) error {
 // @Success      200 {object} errno.errno{data=[]model.Movie}
 // @Router       /movie/cover [put]
 func (h movieHandle) UploadCover(ctx *fiber.Ctx) error {
-	// code := ctx.Params("code", "")
+	code := ctx.Params("code", "")
 
 	form, err := ctx.MultipartForm()
 	if err != nil {
@@ -184,8 +183,6 @@ func (h movieHandle) UploadCover(ctx *fiber.Ctx) error {
 	if files == nil || len(files) <= 0 || len(files) > 1 {
 		return ctx.JSON(errno.DecodeError(errors.New("file is not exist or too many")))
 	}
-
-	fmt.Println(files[0].Filename, files[0].Size, files[0].Header["Content-Type"][0])
 
 	file, err := files[0].Open()
 	if err != nil {
@@ -198,8 +195,6 @@ func (h movieHandle) UploadCover(ctx *fiber.Ctx) error {
 		return ctx.JSON(errno.DecodeError(err))
 	}
 
-	if err := h.storage.SaveImage(fileBytes, "movie", 1, files[0].Filename); err != nil {
-		return ctx.JSON(errno.DecodeError(err))
-	}
-	return ctx.JSON(errno.DecodeError(errno.OK))
+	err = h.svc.UploadMovieCover(code, files[0].Filename, fileBytes)
+	return ctx.JSON(errno.DecodeError(err))
 }

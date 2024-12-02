@@ -29,13 +29,13 @@ func InitApp() (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
-	storageStorage, err := storage.NewStorage(config)
+	storageStorage, err := storage.NewStorage(config, logger)
 	if err != nil {
 		return nil, err
 	}
 	pingService := service.NewPingService(logger, driver, storageStorage)
 	pingHandler := handler.NewPingHandler(pingService)
-	movieService := service.NewMovieService(logger, driver)
+	movieService := service.NewMovieService(logger, driver, storageStorage)
 	validate := utils.NewValidator()
 	movieHandler := handler.NewMovieHandler(movieService, validate, storageStorage, logger)
 	movieActorService := service.NewMovieActorService(logger, driver)
@@ -63,6 +63,6 @@ func InitApp() (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
-	application := NewApplication(routerRouter)
+	application := NewApplication(config, routerRouter)
 	return application, nil
 }

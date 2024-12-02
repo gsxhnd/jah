@@ -16,8 +16,8 @@ func (db *sqliteDB) CreateAnimes(animes []model.Anime) error {
 	}
 
 	stmt, err := tx.Prepare(`INSERT INTO anime 
-	(title, cover, publish_date, created_at, updated_at) 
-	VALUES (?,?,?,?,?);`)
+	(code,title,title_cn, cover, publish_date, created_at, updated_at) 
+	VALUES (?,?,?,?,?,?,?);`)
 	if err != nil {
 		db.logger.Errorf(err.Error())
 		return err
@@ -25,7 +25,7 @@ func (db *sqliteDB) CreateAnimes(animes []model.Anime) error {
 	defer stmt.Close()
 
 	for _, v := range animes {
-		_, err = stmt.Exec(v.Title, v.Cover, v.PublishDate, v.CreatedAt, v.UpdatedAt)
+		_, err = stmt.Exec(v.Code, v.Title, v.TitleCn, v.Cover, v.PublishDate, v.CreatedAt, v.UpdatedAt)
 		if err != nil {
 			db.logger.Errorf(err.Error())
 			return err
@@ -109,7 +109,9 @@ func (db *sqliteDB) GetAnimes(p *database.Pagination) ([]model.Anime, error) {
 		var data = model.Anime{}
 		if err := rows.Scan(
 			&data.Id,
+			&data.Code,
 			&data.Title,
+			&data.TitleCn,
 			&data.Cover,
 			&data.PublishDate,
 			&data.CreatedAt,

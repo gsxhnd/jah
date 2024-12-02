@@ -13,13 +13,13 @@ type Storage interface {
 	SaveImage(data []byte, cover string, id uint, filename string) error
 }
 
-func NewStorage(cfg *utils.Config) (Storage, error) {
+func NewStorage(cfg *utils.Config, l utils.Logger) (Storage, error) {
 	if cfg.Storage.Type == "minio" {
 		return NewMinioStorage(cfg)
 	}
 
 	if cfg.Storage.Type == "local" {
-		return NewLocalStorage(cfg.Storage)
+		return NewLocalStorage(cfg, l)
 	}
 
 	return nil, errors.New("no storage type")

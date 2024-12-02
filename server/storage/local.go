@@ -2,6 +2,7 @@ package storage
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -13,24 +14,33 @@ import (
 )
 
 type localStorage struct {
-	path string
+	path   string
+	logger utils.Logger
 }
 
-func NewLocalStorage(cfg utils.StorageConfig) (Storage, error) {
-	if err := utils.MakeDir(cfg.Path); err != nil {
-		return nil, err
-	}
+func NewLocalStorage(cfg *utils.Config, l utils.Logger) (Storage, error) {
+	var sPath = path.Join(cfg.DataPath, cfg.Storage.Path)
 
-	if err := utils.MakeDir(path.Join(cfg.Path, "actor")); err != nil {
-		return nil, err
-	}
+	// if err := utils.MakeDir(path.Join(sPath, "actor")); err != nil {
+	// 	return nil, err
+	// }
 
-	if err := utils.MakeDir(path.Join(cfg.Path, "movie")); err != nil {
-		return nil, err
+	// if err := utils.MakeDir(path.Join(sPath, "movie")); err != nil {
+	// 	return nil, err
+	// }
+
+	for i := 0; i <= 255; i++ {
+		hex := fmt.Sprintf("%02x", i)
+		if err := os.MkdirAll(path.Join(sPath, "movie", hex), os.ModePerm); err != nil {
+			fmt.Println(err)
+		}
+		if err := os.MkdirAll(path.Join(sPath, "actor", hex), os.ModePerm); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	return &localStorage{
-		path: cfg.Path,
+		path: sPath,
 	}, nil
 }
 
@@ -60,7 +70,11 @@ func (s *localStorage) GetImage(cover string, id uint, filename string) ([]byte,
 }
 
 func (s *localStorage) SaveImage(data []byte, cover string, id uint, filename string) error {
-	err := os.WriteFile(path.Join(s.path, cover, filename), data, 0644)
+	hex := fmt.Sprintf("%02x", id&0xff)
 
-	return err
+	if err := os.WriteFile(path.Join(s.path, cover, hex, filename), data, 0644); err != nil {
+		s.logger.Errorf("Local save image error: %s", err.Error())
+		return err
+	}
+	return nil
 }

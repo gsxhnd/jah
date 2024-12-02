@@ -2,6 +2,7 @@ package di
 
 import (
 	"github.com/gsxhnd/jaha/server/router"
+	"github.com/gsxhnd/jaha/utils"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -9,7 +10,7 @@ type Application struct {
 	r router.Router
 }
 
-func NewApplication(r router.Router) *Application {
+func NewApplication(cfg *utils.Config, r router.Router) *Application {
 	return &Application{
 		r: r,
 	}

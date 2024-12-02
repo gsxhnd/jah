@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/gsxhnd/jaha/server/db/database"
 	"github.com/gsxhnd/jaha/server/model"
+	"github.com/gsxhnd/jaha/server/storage"
 	"github.com/gsxhnd/jaha/utils"
 )
 
@@ -13,17 +14,20 @@ type MovieService interface {
 	GetMovies(*database.Pagination) ([]model.Movie, error)
 	GetMovieInfo(string) (*model.MovieInfo, error)
 	SearchMoviesByCode(string) ([]model.Movie, error)
+	UploadMovieCover(code, filename string, file []byte) error
 }
 
 type movieService struct {
-	logger utils.Logger
-	db     database.Driver
+	logger  utils.Logger
+	db      database.Driver
+	storage storage.Storage
 }
 
-func NewMovieService(l utils.Logger, db database.Driver) MovieService {
+func NewMovieService(l utils.Logger, db database.Driver, s storage.Storage) MovieService {
 	return movieService{
-		logger: l,
-		db:     db,
+		logger:  l,
+		db:      db,
+		storage: s,
 	}
 }
 
@@ -74,4 +78,16 @@ func (s movieService) GetMovieInfo(code string) (*model.MovieInfo, error) {
 	data.Actors = movieActor
 
 	return &data, nil
+}
+
+func (s movieService) UploadMovieCover(code, filename string, file []byte) error {
+	movie, err := s.db.GetMovieByCode(code)
+	if err != nil {
+		return err
+	}
+
+	if err := s.storage.SaveImage(file, "movie", movie.Id, filename); err != nil {
+		return err
+	}
+	return nil
 }
