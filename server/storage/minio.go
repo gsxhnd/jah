@@ -49,6 +49,6 @@ func (s *minioStorage) GetImage(cover string, id uint, filename string) ([]byte,
 	return nil, "", nil
 }
 
-func (s *minioStorage) SaveImage(data []byte, id uint, filename string) error {
+func (s *minioStorage) SaveImage(data []byte, cover string, id uint, filename string) error {
 	return nil
 }

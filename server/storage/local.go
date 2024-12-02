@@ -59,6 +59,8 @@ func (s *localStorage) GetImage(cover string, id uint, filename string) ([]byte,
 	return buff, f, nil
 }
 
-func (s *localStorage) SaveImage(data []byte, id uint, filename string) error {
-	return nil
+func (s *localStorage) SaveImage(data []byte, cover string, id uint, filename string) error {
+	err := os.WriteFile(path.Join(s.path, cover, filename), data, 0644)
+
+	return err
 }

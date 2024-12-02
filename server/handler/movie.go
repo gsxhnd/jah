@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -30,11 +32,12 @@ type movieHandle struct {
 	storage storage.Storage
 }
 
-func NewMovieHandler(svc service.MovieService, v *validator.Validate, l utils.Logger) MovieHandler {
+func NewMovieHandler(svc service.MovieService, v *validator.Validate, s storage.Storage, l utils.Logger) MovieHandler {
 	return &movieHandle{
-		valid:  v,
-		svc:    svc,
-		logger: l,
+		valid:   v,
+		svc:     svc,
+		logger:  l,
+		storage: s,
 	}
 }
 
@@ -171,10 +174,6 @@ func (h *movieHandle) SearchMovies(ctx *fiber.Ctx) error {
 // @Router       /movie/cover [put]
 func (h movieHandle) UploadCover(ctx *fiber.Ctx) error {
 	// code := ctx.Params("code", "")
-	// data, err := h.svc.GetMovieInfo(code)
-	// if err != nil {
-	// 	return ctx.JSON(errno.DecodeError(err))
-	// }
 
 	form, err := ctx.MultipartForm()
 	if err != nil {
@@ -183,17 +182,24 @@ func (h movieHandle) UploadCover(ctx *fiber.Ctx) error {
 
 	files := form.File["cover"]
 	if files == nil || len(files) <= 0 || len(files) > 1 {
-		return ctx.JSON(errno.DecodeError(err))
+		return ctx.JSON(errno.DecodeError(errors.New("file is not exist or too many")))
 	}
 
 	fmt.Println(files[0].Filename, files[0].Size, files[0].Header["Content-Type"][0])
-	f, _ := files[0].Open()
-	defer f.Close()
 
-	var b = make([]byte, 0)
-	n, e := f.Read(b)
-	fmt.Println(n, e)
-	fmt.Println(b)
+	file, err := files[0].Open()
+	if err != nil {
+		return ctx.JSON(errno.DecodeError(err))
+	}
+	defer file.Close()
 
-	return nil
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		return ctx.JSON(errno.DecodeError(err))
+	}
+
+	if err := h.storage.SaveImage(fileBytes, "movie", 1, files[0].Filename); err != nil {
+		return ctx.JSON(errno.DecodeError(err))
+	}
+	return ctx.JSON(errno.DecodeError(errno.OK))
 }

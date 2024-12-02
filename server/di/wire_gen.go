@@ -37,7 +37,7 @@ func InitApp() (*Application, error) {
 	pingHandler := handler.NewPingHandler(pingService)
 	movieService := service.NewMovieService(logger, driver)
 	validate := utils.NewValidator()
-	movieHandler := handler.NewMovieHandler(movieService, validate, logger)
+	movieHandler := handler.NewMovieHandler(movieService, validate, storageStorage, logger)
 	movieActorService := service.NewMovieActorService(logger, driver)
 	movieActorHandler := handler.NewMovieActorHandler(movieActorService, validate, logger)
 	movieTagService := service.NewMovieTagService(logger, driver)

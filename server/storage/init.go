@@ -10,7 +10,7 @@ import (
 type Storage interface {
 	Ping() error
 	GetImage(cover string, id uint, filename string) ([]byte, string, error)
-	SaveImage(data []byte, id uint, filename string) error
+	SaveImage(data []byte, cover string, id uint, filename string) error
 }
 
 func NewStorage(cfg *utils.Config) (Storage, error) {
