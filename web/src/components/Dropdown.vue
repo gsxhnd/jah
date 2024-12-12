@@ -17,7 +17,7 @@
         </span>
       </button>
     </div>
-    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+    <div class="dropdown-menu" id="dropdown-menu" role="menu" @click="aaa">
       <div class="dropdown-content">
         <a href="#" class="dropdown-item"> Dropdown item </a>
         <a class="dropdown-item"> Other dropdown item </a>

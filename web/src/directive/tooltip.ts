@@ -4,9 +4,6 @@ import {
   flip,
   shift,
   offset,
-  autoPlacement,
-  platform,
-  inline,
 } from "@floating-ui/vue";
 import { useElementHover } from "@vueuse/core";
 

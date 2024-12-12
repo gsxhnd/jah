@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, useTemplateRef, watchEffect } from "vue";
+import {  ref, useTemplateRef, watchEffect } from "vue";
 import { onClickOutside } from "@vueuse/core";
 import { useMovieStore } from "@/stores/movie";
 import TagTree from "@/pages/TagTree.vue";
@@ -37,9 +37,6 @@ import {
   flip,
   shift,
   offset,
-  autoPlacement,
-  platform,
-  inline,
 } from "@floating-ui/vue";
 
 const movieStore = useMovieStore();
