@@ -5,9 +5,9 @@
 启动服务
 
 ```shell
-dotenvx run -f .dev.env -- go run ./garage_server
+dotenvx run -f .dev.env -- go run ./server
 ```
 
 ```bash
-swag init -d ./garage_server/router -g init.go --outputTypes yaml --pdl 3
+swag init -d ./server/router -g init.go --outputTypes yaml --pdl 3
 ```
